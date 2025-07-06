@@ -10,8 +10,8 @@ import java.util.Set;
 
 @AllArgsConstructor
 public enum Role {
-	USER(Set.of("self:manage")),
-	ADMIN(Set.of("user:create", "self:manage"));
+	USER(Set.of("self:manage","movie:list","rent:manage")),
+	ADMIN(Set.of("user:create", "self:manage","movie:list","movie:manage"));
 
 	@Getter
 	private final Set<String> permissions;

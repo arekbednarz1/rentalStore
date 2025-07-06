@@ -20,6 +20,9 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public @Data class MovieDto {
 
+	@JsonProperty("id")
+	private Long id;
+
 	@NotNull
 	@NotEmpty
 	@JsonProperty("title")

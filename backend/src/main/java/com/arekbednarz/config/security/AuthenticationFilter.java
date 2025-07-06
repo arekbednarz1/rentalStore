@@ -22,13 +22,13 @@ import java.io.IOException;
 @Component
 public class AuthenticationFilter extends OncePerRequestFilter {
 	private final JwtService jwtService;
-	private final UserDetailsService userDetailsService;
+	private final IManageService userManageService;
 
 	public AuthenticationFilter(
 		JwtService jwtService,
-		UserDetailsService userDetailsService) {
+		@Qualifier("userCreationService") IManageService userManageService) {
 		this.jwtService = jwtService;
-		this.userDetailsService = userDetailsService;
+		this.userManageService = userManageService;
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 		jwt = authHeader.substring(7);
 		userEmail = jwtService.extractUsername(jwt);
 		if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+			UserDetails userDetails = userManageService.getOne(userEmail);
 			if (jwtService.isTokenValid(jwt, userDetails)) {
 				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
 					userDetails,

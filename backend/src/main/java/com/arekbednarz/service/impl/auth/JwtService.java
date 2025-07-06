@@ -1,5 +1,6 @@
 package com.arekbednarz.service.impl.auth;
 
+import com.arekbednarz.model.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -35,7 +36,7 @@ public class JwtService {
 
 	public boolean isTokenValid(String token, UserDetails userDetails) {
 		final String username = extractUsername(token);
-		return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+		return (username.equals(((User)userDetails).getEmail())) && !isTokenExpired(token);
 	}
 
 	public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -45,7 +46,7 @@ public class JwtService {
 
 	public String generateToken(UserDetails userDetails) {
 		LOG.infof("Generating a new token for %s", userDetails.getUsername());
-		return generateToken(new HashMap<>(), userDetails);
+		return generateToken(Map.of("role",((User)userDetails).getRole().name()), userDetails);
 	}
 
 	public String generateRefreshToken(
@@ -69,7 +70,7 @@ public class JwtService {
 
 		return Jwts.builder()
 			.claims().add(extraClaims).and()
-			.subject(userDetails.getUsername())
+			.subject(((User)userDetails).getEmail())
 			.issuedAt(now)
 			.expiration(expiry)
 			.signWith(getSignInKey(), Jwts.SIG.HS256)
