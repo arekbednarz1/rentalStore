@@ -1,0 +1,36 @@
+{
+  "name": "frontend-element",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite"
+  },
+  "dependencies": {
+    "@lion/button": "^0.18.1",
+    "@lion/calendar": "^0.20.1",
+    "@lion/checkbox-group": "^0.21.1",
+    "@lion/combobox": "^0.11.1",
+    "@lion/core": "^0.24.0",
+    "@lion/dialog": "^0.16.1",
+    "@lion/fieldset": "^0.22.1",
+    "@lion/form": "^0.15.0",
+    "@lion/form-core": "^0.18.3",
+    "@lion/input": "^0.18.0",
+    "@lion/radio-group": "^0.21.1",
+    "@lion/select": "^0.17.1",
+    "@lion/textarea": "^0.16.1",
+    "@lion/tooltip": "^0.24.1",
+    "@lit-labs/router": "^0.1.4",
+    "lit": "^3.3.0"
+  },
+  "devDependencies": {
+    "@open-wc/testing": "^4.0.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.7.7",
+    "jsdom": "^26.1.0",
+    "vite": "^5.4.9",
+    "vitest": "^3.2.4"
+  }
+}
