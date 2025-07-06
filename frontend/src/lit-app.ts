@@ -90,6 +90,7 @@ export class LitApp extends LitElement {
                                 <a href="/">Home</a>
                                 <a href="/self">Profile</a>
                                 <a href="/movies">Movies</a>
+                                <a href="/reminder">Reminder</a>
                             </nav>
                             <button class="logout" @click=${this.handleLogout}>Logout</button>
                         </header>
