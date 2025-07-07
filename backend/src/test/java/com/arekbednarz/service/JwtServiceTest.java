@@ -22,7 +22,7 @@ class JwtServiceTest {
 
 	@Test
 	void shouldGenerateTokenAndExtractUser() {
-		UserDetails userDetails = User.builder()
+		User userDetails = User.builder()
 			.email(FAKER.internet().emailAddress())
 			.role(Role.USER)
 			.password(FAKER.internet().password())
@@ -37,12 +37,12 @@ class JwtServiceTest {
 
 		assertNotNull(usernameFromToken);
 
-		assertEquals(userDetails.getUsername(), usernameFromToken);
+		assertEquals(userDetails.getEmail(), usernameFromToken);
 	}
 
 	@Test
 	void shouldGenerateRefreshTokenAndExtractUser() {
-		UserDetails userDetails = User.builder()
+		User userDetails = User.builder()
 			.email(FAKER.internet().emailAddress())
 			.role(Role.USER)
 			.password(FAKER.internet().password())
@@ -57,7 +57,7 @@ class JwtServiceTest {
 
 		assertNotNull(usernameFromToken);
 
-		assertEquals(userDetails.getUsername(), usernameFromToken);
+		assertEquals(userDetails.getEmail(), usernameFromToken);
 	}
 
 	@Test

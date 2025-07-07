@@ -36,7 +36,7 @@ public class JwtService {
 
 	public boolean isTokenValid(String token, UserDetails userDetails) {
 		final String username = extractUsername(token);
-		return (username.equals(((User)userDetails).getEmail())) && !isTokenExpired(token);
+		return (username.equals(((User) userDetails).getEmail())) && !isTokenExpired(token);
 	}
 
 	public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -46,7 +46,7 @@ public class JwtService {
 
 	public String generateToken(UserDetails userDetails) {
 		LOG.infof("Generating a new token for %s", userDetails.getUsername());
-		return generateToken(Map.of("role",((User)userDetails).getRole().name()), userDetails);
+		return generateToken(Map.of("role", ((User) userDetails).getRole().name()), userDetails);
 	}
 
 	public String generateRefreshToken(
@@ -70,7 +70,7 @@ public class JwtService {
 
 		return Jwts.builder()
 			.claims().add(extraClaims).and()
-			.subject(((User)userDetails).getEmail())
+			.subject(((User) userDetails).getEmail())
 			.issuedAt(now)
 			.expiration(expiry)
 			.signWith(getSignInKey(), Jwts.SIG.HS256)

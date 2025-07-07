@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+
 @AllArgsConstructor
 public enum RentTimeEnum {
 	ONE_DAY(LocalDateTime.now().plusDays(1)),

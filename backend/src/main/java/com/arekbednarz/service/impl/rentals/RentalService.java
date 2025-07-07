@@ -27,90 +27,90 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+
 @Service("rentalsManageService")
 public class RentalService implements IRentalService {
-    private static final Logger LOG = Logger.getLogger(RentalService.class);
-    private final IManageService movieManageService;
-    private final IStoreService cacheStoreService;
-    private final RentalsRepository rentalsRepository;
-    private final KafkaProducer kafkaProducer;
+	private static final Logger LOG = Logger.getLogger(RentalService.class);
+	private final IManageService movieManageService;
+	private final IStoreService cacheStoreService;
+	private final RentalsRepository rentalsRepository;
+	private final KafkaProducer kafkaProducer;
 
+	@Autowired
+	public RentalService(
+		@Qualifier("movieManageService") IManageService movieService,
+		IStoreService cacheStoreService,
+		RentalsRepository rentalsRepository,
+		KafkaProducer kafkaProducer) {
+		this.movieManageService = movieService;
+		this.cacheStoreService = cacheStoreService;
+		this.rentalsRepository = rentalsRepository;
+		this.kafkaProducer = kafkaProducer;
+	}
 
-    @Autowired
-    public RentalService(
-            @Qualifier("movieManageService")IManageService movieService,
-            IStoreService cacheStoreService,
-            RentalsRepository rentalsRepository,
-            KafkaProducer kafkaProducer
-    ) {
-        this.movieManageService = movieService;
-        this.cacheStoreService = cacheStoreService;
-        this.rentalsRepository = rentalsRepository;
-        this.kafkaProducer = kafkaProducer;
-    }
+	public void rentMovie(final Long movieId, final User user, final LocalDateTime dueDate) {
+		LOG.infof("Renting movie %d", movieId);
 
-    public void rentMovie(final Long movieId, final User user,final LocalDateTime dueDate) {
-        LOG.infof("Renting movie %d",movieId);
+		Rentals rentObject = createRental(movieId, user, dueDate);
 
-        Rentals rentObject = createRental(movieId, user, dueDate);
+		rentalsRepository.save(rentObject);
+		setMovieAvailability(movieId, false);
+		kafkaProducer.scheduleReminder(rentObject);
+	}
 
-        rentalsRepository.save(rentObject);
-        setMovieAvailability(movieId, false);
-        kafkaProducer.scheduleReminder(rentObject);
-    }
-    public void returnMovie(final Long movieId,final User user) {
-        LOG.infof("Returning movie %d",movieId);
+	public void returnMovie(final Long movieId, final User user) {
+		LOG.infof("Returning movie %d", movieId);
 
-        Rentals returnObject = createReturn(movieId, user);
+		Rentals returnObject = createReturn(movieId, user);
 
-        rentalsRepository.save(returnObject);
-        setMovieAvailability(movieId, true);
-        cacheStoreService.remove(returnObject.getId());
-    }
+		rentalsRepository.save(returnObject);
+		setMovieAvailability(movieId, true);
+		cacheStoreService.remove(returnObject.getId());
+	}
 
-    public List<RentalDto>getRentalsPaged(final Long userId, final boolean returned, final int page, final int size) {
-        PageRequest paged = getPageRequest(page, size);
-        return rentalsRepository
-            .findRentalDtosByUserIdAndReturnedStatus(userId,returned,paged)
-            .getContent();
-    }
+	public List<RentalDto> getRentalsPaged(final Long userId, final boolean returned, final int page, final int size) {
+		PageRequest paged = getPageRequest(page, size);
+		return rentalsRepository
+			.findRentalDtosByUserIdAndReturnedStatus(userId, returned, paged)
+			.getContent();
+	}
 
-    private void setMovieAvailability(final Long movieId,final boolean isAvailable) {
-        movieManageService.update(
-            new MovieUpdateDto(movieId, Set.of(MovieUpdateAction.AVAILABILITY),null,null,isAvailable));
-    }
+	private void setMovieAvailability(final Long movieId, final boolean isAvailable) {
+		movieManageService.update(
+			new MovieUpdateDto(movieId, Set.of(MovieUpdateAction.AVAILABILITY), null, null, isAvailable));
+	}
 
-    private Rentals createRental(final Long movieId, final User user, final LocalDateTime dueDate) {
-        Movie movie = movieManageService.getOne(movieId);
+	private Rentals createRental(final Long movieId, final User user, final LocalDateTime dueDate) {
+		Movie movie = movieManageService.getOne(movieId);
 
-        checkAvailability(movie);
+		checkAvailability(movie);
 
-        return Rentals.builder()
-                .rentedAt(LocalDateTime.now())
-                .movie(movie)
-                .user(user)
-                .dueDate(dueDate)
-                .build();
-    }
+		return Rentals.builder()
+			.rentedAt(LocalDateTime.now())
+			.movie(movie)
+			.user(user)
+			.dueDate(dueDate)
+			.build();
+	}
 
-    private Rentals createReturn(final Long movieId, final User user) {
-        Rentals rental = Option.of(rentalsRepository.findUserActiveMovieRental(user,movieId))
-            .filter(Objects::nonNull)
-            .getOrElseThrow(()->new EntityNotFoundException(Rentals.class,"movieId",movieId.toString()));
+	private Rentals createReturn(final Long movieId, final User user) {
+		Rentals rental = Option.of(rentalsRepository.findUserActiveMovieRental(user, movieId))
+			.filter(Objects::nonNull)
+			.getOrElseThrow(() -> new EntityNotFoundException(Rentals.class, "movieId", movieId.toString()));
 
-        rental.setReturnedAt(LocalDateTime.now());
-        return rental;
-    }
+		rental.setReturnedAt(LocalDateTime.now());
+		return rental;
+	}
 
-    private void checkAvailability(final Movie movie) {
-        if (!movie.isAvailable()){
-            throw new MovieNotAvailableException(movie.getId());
-        }
-    }
+	private void checkAvailability(final Movie movie) {
+		if (!movie.isAvailable()) {
+			throw new MovieNotAvailableException(movie.getId());
+		}
+	}
 
-    private PageRequest getPageRequest(final int page, final int size) {
-        if (page < 0 || size <= 0)
-            throw new BadRequestException("Page index must not be less than zero and page size must be greater than zero");
-        return PageRequest.of(page, size, Sort.by("rentedAt").descending());
-    }
+	private PageRequest getPageRequest(final int page, final int size) {
+		if (page < 0 || size <= 0)
+			throw new BadRequestException("Page index must not be less than zero and page size must be greater than zero");
+		return PageRequest.of(page, size, Sort.by("rentedAt").descending());
+	}
 }

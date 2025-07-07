@@ -1,6 +1,5 @@
 package com.arekbednarz.controller;
 
-
 import com.arekbednarz.dto.movieMgmt.MovieDto;
 import com.arekbednarz.dto.movieMgmt.MovieUpdateDto;
 import com.arekbednarz.enums.Genre;
@@ -18,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
+
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/movies")
 public class MovieManageController {
@@ -26,8 +27,8 @@ public class MovieManageController {
 
 	@Autowired
 	public MovieManageController(
-			@Qualifier("movieManageService") IManageService movieManageService,
-			MovieMapper movieMapper) {
+		@Qualifier("movieManageService") IManageService movieManageService,
+		MovieMapper movieMapper) {
 		this.movieManageService = movieManageService;
 		this.movieMapper = movieMapper;
 	}
@@ -46,7 +47,7 @@ public class MovieManageController {
 
 		return ResponseEntity.ok().body(
 			movieMapper.toMovieDto(movieManageService
-				.update(new MovieUpdateDto(id, Set.of(MovieUpdateAction.AVAILABILITY,MovieUpdateAction.GENRE,MovieUpdateAction.TITLE), title, genre, status))));
+				.update(new MovieUpdateDto(id, Set.of(MovieUpdateAction.AVAILABILITY, MovieUpdateAction.GENRE, MovieUpdateAction.TITLE), title, genre, status))));
 	}
 
 	@DeleteMapping(path = "/{id}", produces = "application/json")
@@ -61,7 +62,7 @@ public class MovieManageController {
 	@PreAuthorize("hasAuthority('movie:manage')")
 	public ResponseEntity createMovie(@RequestBody final MovieDto dto) {
 		return ResponseEntity.ok().body(
-				movieManageService.create(dto));
+			movieMapper.toMovieDto(movieManageService.create(dto)));
 	}
 
 	@GetMapping(path = "/list", produces = "application/json")

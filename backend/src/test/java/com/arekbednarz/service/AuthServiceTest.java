@@ -48,7 +48,7 @@ class AuthServiceTest {
 		var tokenUsername = jwtService.extractUsername(tokenAuthDto.getAccessToken());
 
 		assertNotNull(tokenUsername);
-		assertEquals(userDto.getName(), tokenUsername);
+		assertEquals(userDto.getEmail(), tokenUsername);
 	}
 
 	@Test
@@ -70,7 +70,7 @@ class AuthServiceTest {
 		var tokenUsername = jwtService.extractUsername(tokenAuthDto.getAccessToken());
 
 		assertNotNull(tokenUsername);
-		assertEquals(userDto.getName(), tokenUsername);
+		assertEquals(userDto.getEmail(), tokenUsername);
 	}
 
 }

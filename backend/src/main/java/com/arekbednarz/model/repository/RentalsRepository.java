@@ -15,30 +15,29 @@ import java.util.List;
 
 @Repository
 public interface RentalsRepository extends JpaRepository<Rentals, Long> {
-    @Query("SELECT r FROM Rentals r WHERE r.returnedAt IS null AND r.user =:user AND r.movie.id =:movieId")
-    Rentals findUserActiveMovieRental(@Param("user") User user, @Param("movieId") Long movieId);
+	@Query("SELECT r FROM Rentals r WHERE r.returnedAt IS null AND r.user =:user AND r.movie.id =:movieId")
+	Rentals findUserActiveMovieRental(@Param("user") User user, @Param("movieId") Long movieId);
 
-    @Query("SELECT r FROM Rentals r WHERE r.returnedAt IS null AND r.user =:user")
-    List<Rentals> findUserActiveRentals(@Param("user") User user);
+	@Query("SELECT r FROM Rentals r WHERE r.returnedAt IS null AND r.user =:user")
+	List<Rentals> findUserActiveRentals(@Param("user") User user);
 
-    @Query("""
-    SELECT new com.arekbednarz.dto.rental.RentalDto(
-        m.id, u.email,m.title,m.genre,r.rentedAt,r.returnedAt,r.dueDate
-    )
-    FROM Rentals r
-    JOIN r.user u
-    JOIN r.movie m
-    WHERE u.id = :userId
-      AND (
-        :returned IS NULL OR
-        (:returned = TRUE AND r.returnedAt IS NOT NULL) OR
-        (:returned = FALSE AND r.returnedAt IS NULL)
-      )
-""")
-    Page<RentalDto> findRentalDtosByUserIdAndReturnedStatus(
-            @Param("userId") Long userId,
-            @Param("returned") Boolean returned,
-            Pageable pageable
-    );
+	@Query("""
+		    SELECT new com.arekbednarz.dto.rental.RentalDto(
+		        m.id, u.email,m.title,m.genre,r.rentedAt,r.returnedAt,r.dueDate
+		    )
+		    FROM Rentals r
+		    JOIN r.user u
+		    JOIN r.movie m
+		    WHERE u.id = :userId
+		      AND (
+		        :returned IS NULL OR
+		        (:returned = TRUE AND r.returnedAt IS NOT NULL) OR
+		        (:returned = FALSE AND r.returnedAt IS NULL)
+		      )
+		""")
+	Page<RentalDto> findRentalDtosByUserIdAndReturnedStatus(
+		@Param("userId") Long userId,
+		@Param("returned") Boolean returned,
+		Pageable pageable);
 
 }

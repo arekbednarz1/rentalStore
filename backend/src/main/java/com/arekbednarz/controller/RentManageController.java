@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/rental")
 public class RentManageController {
@@ -18,8 +19,8 @@ public class RentManageController {
 
 	@Autowired
 	public RentManageController(
-			IRentalService rentalService,
-			IStoreService storeService) {
+		IRentalService rentalService,
+		IStoreService storeService) {
 		this.rentalService = rentalService;
 		this.storeService = storeService;
 	}
@@ -27,44 +28,40 @@ public class RentManageController {
 	@PutMapping(path = "/{id}/rent", produces = "application/json")
 	@PreAuthorize("hasAuthority('rent:manage')")
 	public ResponseEntity rentMovie(
-			@PathVariable(value = "id") final Long id,
-			@RequestParam(value = "dueDate")final RentTimeEnum rentTime
-			) {
+		@PathVariable(value = "id") final Long id,
+		@RequestParam(value = "dueDate") final RentTimeEnum rentTime) {
 		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		rentalService.rentMovie(id,currentUser,rentTime.getDateTime());
+		rentalService.rentMovie(id, currentUser, rentTime.getDateTime());
 		return ResponseEntity.noContent().build();
 	}
 
 	@PutMapping(path = "/{id}/return", produces = "application/json")
 	@PreAuthorize("hasAuthority('rent:manage')")
 	public ResponseEntity returnMovie(
-			@PathVariable(value = "id") final Long id
-	) {
+		@PathVariable(value = "id") final Long id) {
 		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		rentalService.returnMovie(id,currentUser);
+		rentalService.returnMovie(id, currentUser);
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping(path = "user/{userid}/{page}/{size}/rentals", produces = "application/json")
-	@PreAuthorize("hasAuthority('rent:manage')")
+	@PreAuthorize("hasAuthority('user:create')")
 	public ResponseEntity getUserRentals(
-			@PathVariable(value = "userid") final Long userid,
-			@PathVariable(value = "page") final int page,
-			@PathVariable(value = "size") final int size,
-			@RequestParam(value = "returned") final boolean returned
-	) {
-		return ResponseEntity.ok().body(rentalService.getRentalsPaged(userid,returned,page,size));
+		@PathVariable(value = "userid") final Long userid,
+		@PathVariable(value = "page") final int page,
+		@PathVariable(value = "size") final int size,
+		@RequestParam(value = "returned") final boolean returned) {
+		return ResponseEntity.ok().body(rentalService.getRentalsPaged(userid, returned, page, size));
 	}
 
 	@GetMapping(path = "self/{page}/{size}/rentals", produces = "application/json")
 	@PreAuthorize("hasAuthority('self:manage')")
 	public ResponseEntity getUserRentals(
-			@PathVariable(value = "page") final int page,
-			@PathVariable(value = "size") final int size,
-			@RequestParam(value = "returned") final boolean returned
-	) {
+		@PathVariable(value = "page") final int page,
+		@PathVariable(value = "size") final int size,
+		@RequestParam(value = "returned") final boolean returned) {
 		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return ResponseEntity.ok().body(rentalService.getRentalsPaged(currentUser.getId(),returned,page,size));
+		return ResponseEntity.ok().body(rentalService.getRentalsPaged(currentUser.getId(), returned, page, size));
 	}
 
 	@GetMapping(path = "self/reminder", produces = "application/json")
@@ -73,7 +70,7 @@ public class RentManageController {
 		User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 		var reminders = storeService.getAll().stream()
-			.filter(reminder->reminder.getUserEmail().equals(currentUser.getEmail()))
+			.filter(reminder -> reminder.getUserEmail().equals(currentUser.getEmail()))
 			.toList();
 
 		return ResponseEntity.ok().body(reminders);

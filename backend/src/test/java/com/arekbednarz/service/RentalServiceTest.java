@@ -31,118 +31,119 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
+
 @SpringBootTest
 @ContextConfiguration(initializers = { PostgresqlTestContainer.class })
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class RentalServiceTest {
 
-    @Autowired
-    private IRentalService rentalService;
+	@Autowired
+	private IRentalService rentalService;
 
-    @Autowired
-    private RentalsRepository rentalsRepository;
+	@Autowired
+	private RentalsRepository rentalsRepository;
 
-    @MockitoSpyBean
-    private MovieRepository movieRepository;
+	@MockitoSpyBean
+	private MovieRepository movieRepository;
 
-    @MockitoSpyBean
-    @Qualifier("movieManageService")
-    private IManageService movieService;
+	@MockitoSpyBean
+	@Qualifier("movieManageService")
+	private IManageService movieService;
 
-    @MockitoSpyBean
-    @Qualifier("userCreationService")
-    private IManageService userService;
+	@MockitoSpyBean
+	@Qualifier("userCreationService")
+	private IManageService userService;
 
-    private final Faker FAKER = new Faker();
+	private final Faker FAKER = new Faker();
 
-    @Test
-    void shouldRentMovie(){
-        var movieDto = getMovieDtoObject();
-        var userDto = getUserDtoObject();
+	@Test
+	void shouldRentMovie() {
+		var movieDto = getMovieDtoObject();
+		var userDto = getUserDtoObject();
 
-        Movie movieDb = movieService.create(movieDto);
-        User userDb = userService.create(userDto);
+		Movie movieDb = movieService.create(movieDto);
+		User userDb = userService.create(userDto);
 
-        var rentDate = LocalDateTime.now();
+		var rentDate = LocalDateTime.now();
 
-        var rentedMoviesBefore = rentalService.getRentalsPaged(userDb.getId(),false,0,10);
+		var rentedMoviesBefore = rentalService.getRentalsPaged(userDb.getId(), false, 0, 10);
 
-        rentalService.rentMovie(movieDb.getId(),userDb, rentDate);
+		rentalService.rentMovie(movieDb.getId(), userDb, rentDate);
 
-        var rentedMoviesAfter = rentalService.getRentalsPaged(userDb.getId(),false,0,10);
+		var rentedMoviesAfter = rentalService.getRentalsPaged(userDb.getId(), false, 0, 10);
 
-        assertNotEquals(rentedMoviesBefore, rentedMoviesAfter);
-        assertEquals(rentedMoviesBefore.size()+1, rentedMoviesAfter.size());
-    }
+		assertNotEquals(rentedMoviesBefore, rentedMoviesAfter);
+		assertEquals(rentedMoviesBefore.size() + 1, rentedMoviesAfter.size());
+	}
 
-    @Test
-    void shouldReturnMovie(){
-        var movieDto1 = getMovieDtoObject();
-        var movieDto2 = getMovieDtoObject();
-        var userDto = getUserDtoObject();
+	@Test
+	void shouldReturnMovie() {
+		var movieDto1 = getMovieDtoObject();
+		var movieDto2 = getMovieDtoObject();
+		var userDto = getUserDtoObject();
 
-        Movie movieDb1 = movieService.create(movieDto1);
-        Movie movieDb2 = movieService.create(movieDto2);
-        User userDb = userService.create(userDto);
+		Movie movieDb1 = movieService.create(movieDto1);
+		Movie movieDb2 = movieService.create(movieDto2);
+		User userDb = userService.create(userDto);
 
-        var rentDate = LocalDateTime.now().plusDays(4L);
+		var rentDate = LocalDateTime.now().plusDays(4L);
 
-        var rentedMoviesBefore = rentalService.getRentalsPaged(userDb.getId(),false,0,10);
+		var rentedMoviesBefore = rentalService.getRentalsPaged(userDb.getId(), false, 0, 10);
 
-        rentalService.rentMovie(movieDb1.getId(),userDb, rentDate);
-        rentalService.rentMovie(movieDb2.getId(),userDb, rentDate);
+		rentalService.rentMovie(movieDb1.getId(), userDb, rentDate);
+		rentalService.rentMovie(movieDb2.getId(), userDb, rentDate);
 
-        var returnedMoviesBefore = rentalService.getRentalsPaged(userDb.getId(),true,0,10);
+		var returnedMoviesBefore = rentalService.getRentalsPaged(userDb.getId(), true, 0, 10);
 
-        rentalService.returnMovie(movieDb1.getId(),userDb);
+		rentalService.returnMovie(movieDb1.getId(), userDb);
 
-        var returnedMoviesAfter = rentalService.getRentalsPaged(userDb.getId(),true,0,10);
-        var rentedMoviesAfter = rentalService.getRentalsPaged(userDb.getId(),false,0,10);
+		var returnedMoviesAfter = rentalService.getRentalsPaged(userDb.getId(), true, 0, 10);
+		var rentedMoviesAfter = rentalService.getRentalsPaged(userDb.getId(), false, 0, 10);
 
-        assertNotEquals(returnedMoviesBefore, returnedMoviesAfter);
-        assertEquals(rentedMoviesBefore.size()+1, rentedMoviesAfter.size());
-        assertEquals(returnedMoviesBefore.size()+1, returnedMoviesAfter.size());
-    }
+		assertNotEquals(returnedMoviesBefore, returnedMoviesAfter);
+		assertEquals(rentedMoviesBefore.size() + 1, rentedMoviesAfter.size());
+		assertEquals(returnedMoviesBefore.size() + 1, returnedMoviesAfter.size());
+	}
 
-    @Test
-    void shouldThrowExceptionWhenMovieIsNotAvailable(){
-        Movie movie = Movie.builder()
-                .id(1L)
-                .available(false)
-                .title(FAKER.internet().avatar())
-                .genre(Genre.DRAMA)
-                .build();
+	@Test
+	void shouldThrowExceptionWhenMovieIsNotAvailable() {
+		Movie movie = Movie.builder()
+			.id(1L)
+			.available(false)
+			.title(FAKER.internet().avatar())
+			.genre(Genre.DRAMA)
+			.build();
 
-        when(movieRepository.findById(anyLong())).thenReturn(Optional.ofNullable(movie));
+		when(movieRepository.findById(anyLong())).thenReturn(Optional.ofNullable(movie));
 
-        assertThrows(MovieNotAvailableException.class, () -> rentalService.rentMovie(1L,new User(), LocalDateTime.now().plusDays(4L)));
-    }
+		assertThrows(MovieNotAvailableException.class, () -> rentalService.rentMovie(1L, new User(), LocalDateTime.now().plusDays(4L)));
+	}
 
-    @Test
-    void shouldThrowExceptionWhenMovieNotFound(){
-        assertThrows(EntityNotFoundException.class, () -> rentalService.rentMovie(99L,new User(), LocalDateTime.now().plusDays(4L)));
-    }
+	@Test
+	void shouldThrowExceptionWhenMovieNotFound() {
+		assertThrows(EntityNotFoundException.class, () -> rentalService.rentMovie(99L, new User(), LocalDateTime.now().plusDays(4L)));
+	}
 
-    @Test
-    void shouldThrowExceptionWhenPageOrSizeIsIncorrect(){
-        assertThrows(BadRequestException.class, () -> rentalService.getRentalsPaged(21L,false,-1,-2));
-    }
+	@Test
+	void shouldThrowExceptionWhenPageOrSizeIsIncorrect() {
+		assertThrows(BadRequestException.class, () -> rentalService.getRentalsPaged(21L, false, -1, -2));
+	}
 
-    private MovieDto getMovieDtoObject() {
-        return MovieDto.builder()
-                .title(FAKER.chuckNorris().fact())
-                .genre(Genre.COMEDY)
-                .available(true)
-                .build();
-    }
+	private MovieDto getMovieDtoObject() {
+		return MovieDto.builder()
+			.title(FAKER.chuckNorris().fact())
+			.genre(Genre.COMEDY)
+			.available(true)
+			.build();
+	}
 
-    private UserDto getUserDtoObject() {
-        return UserDto.builder()
-                .name(FAKER.name().name())
-                .role(Role.USER)
-                .email(FAKER.internet().emailAddress())
-                .password("TEST")
-                .build();
-    }
+	private UserDto getUserDtoObject() {
+		return UserDto.builder()
+			.name(FAKER.name().name())
+			.role(Role.USER)
+			.email(FAKER.internet().emailAddress())
+			.password("TEST")
+			.build();
+	}
 }

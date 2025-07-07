@@ -1,7 +1,7 @@
 import { fixture, html } from '@open-wc/testing';
 import { expect, vi, describe, it, beforeEach } from 'vitest';
-import './login-form.ts';
-import { LoginForm } from './login-form';
+import '../login-form.ts';
+import { LoginForm } from '../login-form';
 
 describe('<login-form>', () => {
     let el: LoginForm;

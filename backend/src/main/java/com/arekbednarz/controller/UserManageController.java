@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashSet;
 import java.util.Set;
 
-
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserManageController {
@@ -27,8 +27,8 @@ public class UserManageController {
 
 	@Autowired
 	public UserManageController(
-			@Qualifier("userCreationService") IManageService userManageService,
-			UserMapper userMapper) {
+		@Qualifier("userCreationService") IManageService userManageService,
+		UserMapper userMapper) {
 		this.userManageService = userManageService;
 		this.userMapper = userMapper;
 	}

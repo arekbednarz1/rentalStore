@@ -7,12 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public @Data class ReminderMessageDto {
-    private Long rentalId;
-    private String userEmail;
-    private String movieTitle;
-    private LocalDateTime dueDate;
+	private Long rentalId;
+	private String userEmail;
+	private String movieTitle;
+	private LocalDateTime dueDate;
 }

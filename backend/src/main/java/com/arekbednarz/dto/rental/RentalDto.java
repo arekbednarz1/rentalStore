@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @Builder
@@ -17,25 +18,25 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RentalDto {
 
-    @JsonProperty("movieId")
-    private Long movieId;
+	@JsonProperty("movieId")
+	private Long movieId;
 
-    @JsonProperty("userEmail")
-    private String userEmail;
+	@JsonProperty("userEmail")
+	private String userEmail;
 
-    @JsonProperty("movieTitle")
-    private String movieTitle;
+	@JsonProperty("movieTitle")
+	private String movieTitle;
 
-    @JsonProperty("genre")
-    private Genre genre;
+	@JsonProperty("genre")
+	private Genre genre;
 
-    @JsonProperty("rentedAt")
-    private LocalDateTime rentedAt;
+	@JsonProperty("rentedAt")
+	private LocalDateTime rentedAt;
 
-    @JsonProperty("returnedAt")
-    private LocalDateTime returnedAt;
+	@JsonProperty("returnedAt")
+	private LocalDateTime returnedAt;
 
-    @JsonProperty("dueDate")
-    private LocalDateTime dueDate;
+	@JsonProperty("dueDate")
+	private LocalDateTime dueDate;
 
 }

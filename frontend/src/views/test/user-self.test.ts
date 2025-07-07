@@ -1,7 +1,7 @@
 import { fixture, html } from '@open-wc/testing';
 import { expect, vi } from 'vitest';
-import './user-self.ts';
-import { UserSelf } from './user-self.ts';
+import '../user-self.ts';
+import { UserSelf } from '../user-self.ts';
 
 describe('<user-self>', () => {
     beforeEach(() => {

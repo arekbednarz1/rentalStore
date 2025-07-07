@@ -1,7 +1,7 @@
 import { fixture, html } from '@open-wc/testing';
 import { expect, vi } from 'vitest';
-import './register-form.ts';
-import {RegisterForm} from "./register-form";
+import '../register-form.ts';
+import {RegisterForm} from "../register-form";
 
 describe('<register-form>', () => {
     it('renders the form with correct fields', async () => {

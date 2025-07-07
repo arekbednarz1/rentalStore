@@ -16,34 +16,35 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+
 @ExtendWith(MockitoExtension.class)
 class KafkaProducerTest {
 
-    @Test
-    void shouldSendReminderImmediatelyIfLessThan24Hours() {
-        KafkaTemplate<String, ReminderMessageDto> kafkaTemplate = mock();
+	@Test
+	void shouldSendReminderImmediatelyIfLessThan24Hours() {
+		KafkaTemplate<String, ReminderMessageDto> kafkaTemplate = mock();
 
-        KafkaProducer producer = new KafkaProducer(kafkaTemplate);
+		KafkaProducer producer = new KafkaProducer(kafkaTemplate);
 
-        Rentals rental = mock();
-        when(rental.getDueDate()).thenReturn(LocalDateTime.now().plusHours(12));
-        when(rental.getId()).thenReturn(42L);
+		Rentals rental = mock();
+		when(rental.getDueDate()).thenReturn(LocalDateTime.now().plusHours(12));
+		when(rental.getId()).thenReturn(42L);
 
-        User user = mock();
-        when(user.getEmail()).thenReturn("test@test.com");
-        when(rental.getUser()).thenReturn(user);
+		User user = mock();
+		when(user.getEmail()).thenReturn("test@test.com");
+		when(rental.getUser()).thenReturn(user);
 
-        Movie movie = mock();
-        when(movie.getTitle()).thenReturn("TEST");
-        when(rental.getMovie()).thenReturn(movie);
+		Movie movie = mock();
+		when(movie.getTitle()).thenReturn("TEST");
+		when(rental.getMovie()).thenReturn(movie);
 
-        producer.scheduleReminder(rental);
+		producer.scheduleReminder(rental);
 
-        ArgumentCaptor<ReminderMessageDto> captor = ArgumentCaptor.forClass(ReminderMessageDto.class);
-        verify(kafkaTemplate).send(eq("rental-reminders"), eq("42"), captor.capture());
+		ArgumentCaptor<ReminderMessageDto> captor = ArgumentCaptor.forClass(ReminderMessageDto.class);
+		verify(kafkaTemplate).send(eq("rental-reminders"), eq("42"), captor.capture());
 
-        ReminderMessageDto sent = captor.getValue();
-        assertEquals("TEST", sent.getMovieTitle());
-        assertEquals("test@test.com", sent.getUserEmail());
-    }
+		ReminderMessageDto sent = captor.getValue();
+		assertEquals("TEST", sent.getMovieTitle());
+		assertEquals("test@test.com", sent.getUserEmail());
+	}
 }

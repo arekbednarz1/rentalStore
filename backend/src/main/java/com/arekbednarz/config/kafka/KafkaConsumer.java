@@ -6,13 +6,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+
 @Component
 @AllArgsConstructor
 public class KafkaConsumer {
-    private final IStoreService storeService;
+	private final IStoreService storeService;
 
-    @KafkaListener(topics = "rental-reminders", groupId = "reminder-group")
-    public void handleReminder(ReminderMessageDto message) {
-        storeService.add(message);
-    }
+	@KafkaListener(topics = "rental-reminders", groupId = "reminder-group")
+	public void handleReminder(ReminderMessageDto message) {
+		storeService.add(message);
+	}
 }
